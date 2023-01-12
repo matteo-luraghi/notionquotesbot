@@ -50,11 +50,11 @@ def automaticQuote():  #list(db.keys()) keys, token, databaseId
 
 #checks if the user sent a valid Notion token
 def checkToken(message):
-    if message.chat.id in db and ("initialized" not in db[message.chat.id] or db[message.chat.id][2] != "initialized"):
+    if message.chat.id in db and ("initialized" not in db[str(message.chat.id)] or db[str(message.chat.id)][2] != "initialized"):
         global init
         if init[message.chat.id][1] == 0 and init[message.chat.id][0] == 0:
             if message.text.split('_')[0] == "secret":
-                db[message.chat.id].append(message.text)
+                db[str(message.chat.id)].append(message.text)
                 init[message.chat.id][0] = 1
                 return True
             quotesbot.send_message(message.chat.id, "Notion token not valid, try to send it again")
@@ -65,11 +65,11 @@ def checkToken(message):
 
 #checks if the user sent a valid Notion database ID
 def checkDatabseId(message):
-    if message.chat.id in db and ("initialized" not in db[message.chat.id] or db[message.chat.id][2] != "initialized"):
+    if message.chat.id in db and ("initialized" not in db[str(message.chat.id)] or db[str(message.chat.id)][2] != "initialized"):
         global init
         if init[message.chat.id][0] == 1 and init[message.chat.id][1] == 0:
             if len(message.text) >= 25:
-                db[message.chat.id].append(message.text)
+                db[str(message.chat.id)].append(message.text)
                 init[message.chat.id][1] = 1
                 return True
             quotesbot.send_message(message.chat.id, "Database ID not valid, try to send it again")
@@ -122,8 +122,8 @@ def start(message):
     time.sleep(1)
     quotesbot.send_message(message.chat.id, "Let's get you ready to start using the bot")
     if message.chat.id not in db:
-        db[message.chat.id] = []
-    if len(db[message.chat.id])==0 or db[message.chat.id][2] != "initialized":
+        db[str(message.chat.id)] = []
+    if len(db[str(message.chat.id)])==0 or db[str(message.chat.id)][2] != "initialized":
         tokenOk = 0
         databaseIdOk = 0
         init[message.chat.id] = []
@@ -134,18 +134,18 @@ def start(message):
 #the command /quote accesses the user's notion database and sends a random quote from it
 @quotesbot.message_handler(commands=["quote"])
 def sendQuote(message):
-    if message.chat.id in db and len(db[message.chat.id])!=0 and db[message.chat.id][2] == "initialized":
+    if message.chat.id in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
         quotes = []
-        readDatabase(db[message.chat.id][0], db[message.chat.id][1], quotes)
+        readDatabase(db[str(message.chat.id)][0], db[str(message.chat.id)][1], quotes)
         randomQuote = random.randint(0, len(quotes))
         quotesbot.send_message(message.chat.id, quotes[randomQuote])
 
 #the command /new asks the user to send a title for the new notion page and the content (the emoji is optional), then creates the new notion quote page
 @quotesbot.message_handler(commands=["new"])
 def createQuote(message):
-    if message.chat.id in db and len(db[message.chat.id])!=0 and db[message.chat.id][2] == "initialized":
-        databaseId = db[message.chat.id][1]
-        headers = createHeaders(db[message.chat.id][0])
+    if message.chat.id in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
+        databaseId = db[str(message.chat.id)][1]
+        headers = createHeaders(db[str(message.chat.id)][0])
         newPage[message.chat.id] = []
         quotesbot.send_message(message.chat.id, 'Type "Title: " followed by the title of the new page')
         while len(newPage[message.chat.id]) != 3:
@@ -224,18 +224,18 @@ def verifyToken(message):
 @quotesbot.message_handler(func=checkDatabseId)
 def verifyDatabaseId(message):
     global init
-    headers = createHeaders(db[message.chat.id][0])
-    readUrl = f"https://api.notion.com/v1/databases/{db[message.chat.id][1]}/query"
+    headers = createHeaders(db[str(message.chat.id)][0])
+    readUrl = f"https://api.notion.com/v1/databases/{db[str(message.chat.id)][1]}/query"
     res = requests.request("POST", readUrl, headers=headers)
     if res.status_code != 200:
-        del db[message.chat.id][0]
-        del db[message.chat.id][0]
+        del db[str(message.chat.id)][0]
+        del db[str(message.chat.id)][0]
         quotesbot.send_message(message.chat.id, "Token or database ID not valid, resend the token")
         init[message.chat.id][0] = 0
         init[message.chat.id][1] = 0
     else:
         quotesbot.send_message(message.chat.id, "Setup completed!")
-        db[message.chat.id].append("initialized")
+        db[str(message.chat.id)].append("initialized")
         del init[message.chat.id]
 
 #if the function checkTitle returns True asks the user to send the content for the new quote
