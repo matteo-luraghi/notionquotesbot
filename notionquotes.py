@@ -1,5 +1,6 @@
 import telebot, os, time, requests, json, random, schedule
 from threading import Thread
+from keep_alive import keep_alive
 from replit import db
 
 API_KEY = os.environ['API_KEY']
@@ -256,4 +257,5 @@ if __name__ == "__main__":
     #schedules the daily quote
     schedule.every().day.at(TIME).do(automaticQuote)
     Thread(target=schedule_checker).start() 
+    keep_alive()
     quotesbot.polling()
