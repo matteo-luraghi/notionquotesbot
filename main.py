@@ -1,11 +1,10 @@
 import telebot, os, time, requests, json, random, schedule
 from threading import Thread
 from keep_alive import keep_alive
-#from replit import db
+from replit import db
 
 API_KEY = os.environ['API_KEY']
 
-db = {}
 init = {}
 newPage = {}
 
