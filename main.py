@@ -50,7 +50,7 @@ def automaticQuote():  #list(db.keys()) keys, token, databaseId
 
 #checks if the user sent a valid Notion token
 def checkToken(message):
-    if message.chat.id in db and ("initialized" not in db[str(message.chat.id)] or db[str(message.chat.id)][2] != "initialized"):
+    if str(message.chat.id) in db and ("initialized" not in db[str(message.chat.id)] or db[str(message.chat.id)][2] != "initialized"):
         global init
         if init[message.chat.id][1] == 0 and init[message.chat.id][0] == 0:
             if message.text.split('_')[0] == "secret":
@@ -59,13 +59,13 @@ def checkToken(message):
                 return True
             quotesbot.send_message(message.chat.id, "Notion token not valid, try to send it again")
             return False
-    elif message.chat.id not in db:
+    elif str(message.chat.id) not in db:
         quotesbot.send_message(message.chat.id, "Use the command /start to initialize the bot")
     return False
 
 #checks if the user sent a valid Notion database ID
 def checkDatabseId(message):
-    if message.chat.id in db and ("initialized" not in db[str(message.chat.id)] or db[str(message.chat.id)][2] != "initialized"):
+    if str(message.chat.id) in db and ("initialized" not in db[str(message.chat.id)] or db[str(message.chat.id)][2] != "initialized"):
         global init
         if init[message.chat.id][0] == 1 and init[message.chat.id][1] == 0:
             if len(message.text) >= 25:
@@ -121,7 +121,7 @@ def start(message):
     quotesbot.send_chat_action(message.chat.id, "typing")
     time.sleep(1)
     quotesbot.send_message(message.chat.id, "Let's get you ready to start using the bot")
-    if message.chat.id not in db:
+    if str(message.chat.id) not in db:
         db[str(message.chat.id)] = []
     if len(db[str(message.chat.id)])==0 or db[str(message.chat.id)][2] != "initialized":
         tokenOk = 0
@@ -134,7 +134,7 @@ def start(message):
 #the command /quote accesses the user's notion database and sends a random quote from it
 @quotesbot.message_handler(commands=["quote"])
 def sendQuote(message):
-    if message.chat.id in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
+    if str(message.chat.id) in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
         quotes = []
         readDatabase(db[str(message.chat.id)][0], db[str(message.chat.id)][1], quotes)
         randomQuote = random.randint(0, len(quotes))
@@ -143,7 +143,7 @@ def sendQuote(message):
 #the command /new asks the user to send a title for the new notion page and the content (the emoji is optional), then creates the new notion quote page
 @quotesbot.message_handler(commands=["new"])
 def createQuote(message):
-    if message.chat.id in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
+    if str(message.chat.id) in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
         databaseId = db[str(message.chat.id)][1]
         headers = createHeaders(db[str(message.chat.id)][0])
         newPage[message.chat.id] = []
