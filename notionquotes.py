@@ -11,7 +11,7 @@ newPage = {}
 #at this time it will be sent an automatic quote from the user's personal notion page
 TIME = "12:00"
 
- #creates the headers to access the notion API
+#creates the headers to access the notion API
 def createHeaders(token):
     headers = {
         "Authorization": "Bearer " + token,
