@@ -9,7 +9,7 @@ init = {}
 newPage = {}
 
 #at this time it will be sent an automatic quote from the user's personal notion page
-TIME = "12:00"
+TIME = "12:30"
 
 #creates the headers to access the notion API
 def createHeaders(token):
@@ -45,7 +45,7 @@ def automaticQuote():  #list(db.keys()) keys, token, databaseId
         databaseId = item[1][1]
         quotes = []
         readDatabase(token, databaseId, quotes)
-        randomQuote = random.randint(0, len(quotes))
+        randomQuote = random.randint(0, len(quotes)-1)
         quotesbot.send_message(chatId, quotes[randomQuote])
 
 #checks if the user sent a valid Notion token
@@ -137,7 +137,7 @@ def sendQuote(message):
     if str(message.chat.id) in db and len(db[str(message.chat.id)])!=0 and db[str(message.chat.id)][2] == "initialized":
         quotes = []
         readDatabase(db[str(message.chat.id)][0], db[str(message.chat.id)][1], quotes)
-        randomQuote = random.randint(0, len(quotes))
+        randomQuote = random.randint(0, len(quotes)-1)
         quotesbot.send_message(message.chat.id, quotes[randomQuote])
 
 #the command /new asks the user to send a title for the new notion page and the content (the emoji is optional), then creates the new notion quote page
