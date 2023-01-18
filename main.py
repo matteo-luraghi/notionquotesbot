@@ -317,7 +317,8 @@ def createQuote(message):
 #stops the creation of a new page
 @quotesbot.message_handler(commands=["cancel"])
 def cancelNewPage(message):
-    del newPage[message.chat.id]
+    if message.chat.id in newPage:
+        del newPage[message.chat.id]
 
 #if the function checkToken returns True asks for the notion Database ID
 @quotesbot.message_handler(func=checkToken)
