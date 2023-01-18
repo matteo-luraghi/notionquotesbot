@@ -169,7 +169,8 @@ def createQuote(message):
         newPage[message.chat.id] = []
         quotesbot.send_message(message.chat.id, 'Type "Title: " followed by the title of the new page')
         while len(newPage[message.chat.id]) != 4:
-            time.sleep(1)
+            if message.chat.id not in newPage:
+                return
         createUrl = "https://api.notion.com/v1/pages"
         pageName = newPage[message.chat.id][0]
         pageAuthor = newPage[message.chat.id][1]
