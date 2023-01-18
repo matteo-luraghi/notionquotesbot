@@ -11,6 +11,9 @@ newPage = {}
 #at this time it will be sent an automatic quote from the user's personal notion page
 TIME = "12:30"
 
+#bot initialization                    
+quotesbot = telebot.TeleBot(API_KEY)
+
 #creates the headers to access the notion API
 def createHeaders(token):
     headers = {
@@ -27,9 +30,13 @@ def readDatabase(token, databaseId, quotes):
     res = requests.request("POST", readUrl, headers=headers)
     data = res.json()
     for el in data["results"]:
-        text = el["properties"]["Text"]["rich_text"]
-        for obj in text:
-            quotes.append(obj["text"]["content"])
+        text = el["properties"]["Text"]["rich_text"][0]["text"]["content"]
+        title = el["properties"]["Name"]["title"][0]["plain_text"]
+        try:
+            author = el["properties"]["Author"]["rollup"]["array"][0]["rich_text"][0]["text"]["content"]    
+        except:
+            author = el["properties"]["Author"]["rich_text"][0]["text"]["content"]
+        quotes.append([text, title, author])
 
 #looks every second for schedules to run
 def schedule_checker():
@@ -46,7 +53,10 @@ def automaticQuote():  #list(db.keys()) keys, token, databaseId
         quotes = []
         readDatabase(token, databaseId, quotes)
         randomQuote = random.randint(0, len(quotes)-1)
-        quotesbot.send_message(chatId, quotes[randomQuote])
+        quotesbot.send_message(chatId, quotes[randomQuote][0])
+        time.sleep(2)
+        titleAuthor = f'"{quotes[randomQuote][1]}" - {quotes[randomQuote][2]}'
+        quotesbot.send_message(chatId, titleAuthor)
 
 #checks if the user sent a valid Notion token
 def checkToken(message):
@@ -85,11 +95,21 @@ def checkTitle(message):
             quotesbot.send_message(message.chat.id, 'Error, type "Title: " followed by the title of the new page')
     return False
 
+#checks if the user has sent the new quote's author's name
+def checkAuthor(message):
+    if message.chat.id in newPage and len(newPage[message.chat.id])==1:
+        if message.text[:8] == "Author: ":
+            newPage[message.chat.id].append(message.text[8:])  
+            return True
+        else:
+            quotesbot.send_message(message.chat.id, 'Error, type "Author: " followed by the author\'s name')
+    return False
+
 #checks if the user has sent the content for a new quote
 def checkContent(message):
-    if message.chat.id in newPage and len(newPage[message.chat.id])==1:
+    if message.chat.id in newPage and len(newPage[message.chat.id])==2:
         if message.text[:9] == "Content: ":
-            newPage[message.chat.id].append(message.text[9:])  
+            newPage[message.chat.id].append(message.text[9:]) 
             return True
         else:
             quotesbot.send_message(message.chat.id, 'Error, type "Content: " followed by the quote you want to add')
@@ -97,7 +117,7 @@ def checkContent(message):
 
 #checks if the user has sent an emoji for a new quote
 def checkEmoji(message):
-    if message.chat.id in newPage and len(newPage[message.chat.id])==2:
+    if message.chat.id in newPage and len(newPage[message.chat.id])==3:
         if "no" in message.text.lower():
             newPage[message.chat.id].append(0)
             return True
@@ -108,9 +128,6 @@ def checkEmoji(message):
         else:
             quotesbot.send_message(message.chat.id, 'Error, type: "Emoji: " followed by the emoji that suits the most the quote you are adding (type "no" if you don\'t want to add an emoji)')
     return False
-
-#bot initialization                    
-quotesbot = telebot.TeleBot(API_KEY)
 
 #the command /start greets the user, uses the chat ID to create a new key in the replit database and asks the user to send the notion token
 @quotesbot.message_handler(commands=["start"])
@@ -138,7 +155,10 @@ def sendQuote(message):
         quotes = []
         readDatabase(db[str(message.chat.id)][0], db[str(message.chat.id)][1], quotes)
         randomQuote = random.randint(0, len(quotes)-1)
-        quotesbot.send_message(message.chat.id, quotes[randomQuote])
+        quotesbot.send_message(message.chat.id, quotes[randomQuote][0])
+        time.sleep(2)
+        titleAuthor = f'"{quotes[randomQuote][1]}" - {quotes[randomQuote][2]}'
+        quotesbot.send_message(message.chat.id, titleAuthor)
 
 #the command /new asks the user to send a title for the new notion page and the content (the emoji is optional), then creates the new notion quote page
 @quotesbot.message_handler(commands=["new"])
@@ -148,20 +168,31 @@ def createQuote(message):
         headers = createHeaders(db[str(message.chat.id)][0])
         newPage[message.chat.id] = []
         quotesbot.send_message(message.chat.id, 'Type "Title: " followed by the title of the new page')
-        while len(newPage[message.chat.id]) != 3:
+        while len(newPage[message.chat.id]) != 4:
             time.sleep(1)
         createUrl = "https://api.notion.com/v1/pages"
         pageName = newPage[message.chat.id][0]
-        pageContent = newPage[message.chat.id][1]
-        if newPage[message.chat.id][2] != 0:
-            emojiImg = newPage[message.chat.id][2]     
+        pageAuthor = newPage[message.chat.id][1]
+        pageContent = newPage[message.chat.id][2]
+
+        if newPage[message.chat.id][3] != 0:
+            emojiImg = newPage[message.chat.id][3]     
             newPageData = {
                 "icon": {
-                        "type": "emoji",
+                    "type": "emoji",                                      
                         "emoji": emojiImg
                     },
                 "parent": {"database_id": databaseId},
                 "properties": { 
+                    "Author": {
+                        "rich_text": [
+                            {
+                                "text": {
+                                    "content": pageAuthor
+                                }
+                            }
+                        ]
+                    },
                     "Name": {
                         "title": [
                             {
@@ -170,7 +201,7 @@ def createQuote(message):
                                 }
                             }
                         ]
-                    },
+                    },      
                     "Text": {
                         "rich_text": [
                             {
@@ -187,6 +218,15 @@ def createQuote(message):
             newPageData = {
                 "parent": {"database_id": databaseId},
                 "properties": { 
+                    "Author": {
+                        "rich_text": [
+                            {
+                                "text": {
+                                     "content": pageAuthor
+                                }
+                            }
+                        ]
+                    },
                     "Name": {
                         "title": [
                             {
@@ -206,13 +246,72 @@ def createQuote(message):
                         ]
                     }
                 }
-            }
+            }       
         data = json.dumps(newPageData)
         res = requests.request("POST", createUrl, headers=headers, data=data)
         if res.status_code == 200:
             quotesbot.send_message(message.chat.id ,"Page created!")
         else:
-            quotesbot.send_message(message.chat.id, "Sorry, there seems to be an error, try again with the command /new")
+            if newPage[message.chat.id][3] != 0:
+                emojiImg = newPage[message.chat.id][3]     
+                newPageData = {
+                    "icon": {
+                            "type": "emoji",                                      
+                            "emoji": emojiImg
+                        },
+                    "parent": {"database_id": databaseId},
+                    "properties": { 
+                        "Name": {
+                            "title": [
+                                {
+                                    "text": {
+                                        "content": pageName
+                                    }
+                                }
+                            ]
+                        },
+                        "Text": {
+                            "rich_text": [
+                                {
+                                    "text": {
+                                        "content": pageContent
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+
+            else:
+                newPageData = {
+                    "parent": {"database_id": databaseId},
+                    "properties": { 
+                        "Name": {
+                            "title": [
+                                {
+                                    "text": {
+                                        "content": pageName
+                                    }
+                                }
+                            ]
+                        },
+                        "Text": {
+                            "rich_text": [
+                                {
+                                    "text": {
+                                        "content": pageContent
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            data = json.dumps(newPageData)
+            res = requests.request("POST", createUrl, headers=headers, data=data)
+            if res.status_code == 200:
+                quotesbot.send_message(message.chat.id ,"Page created!")
+            else:
+                quotesbot.send_message(message.chat.id, "Sorry, there seems to be an error, try again with the command /new")
 
 #if the function checkToken returns True asks for the notion Database ID
 @quotesbot.message_handler(func=checkToken)
@@ -241,7 +340,12 @@ def verifyDatabaseId(message):
 #if the function checkTitle returns True asks the user to send the content for the new quote
 @quotesbot.message_handler(func=checkTitle)
 def verifyTitle(message):
-    quotesbot.send_message(message.chat.id, 'Type "Content: " followed by the quote you want to add')
+    quotesbot.send_message(message.chat.id, 'Type: "Author: " followed by the author\'s name')
+
+#calls the checkAuthor function
+@quotesbot.message_handler(func=checkAuthor)
+def verifyAuthor(message):
+    quotesbot.send_message(message.chat.id, 'Type: "Content: " followed by the quote you want to add')
 
 #if the function checkContent returns True asks the user to sent an emoji for the new quote
 @quotesbot.message_handler(func=checkContent)
