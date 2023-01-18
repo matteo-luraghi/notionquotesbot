@@ -168,7 +168,7 @@ def createQuote(message):
         headers = createHeaders(db[str(message.chat.id)][0])
         newPage[message.chat.id] = []
         quotesbot.send_message(message.chat.id, 'Type "Title: " followed by the title of the new page')
-        while len(newPage[message.chat.id]) != 4 and message.chat.id in newPage:
+        while message.chat.id in newPage and len(newPage[message.chat.id]) != 4:
             if message.chat.id not in newPage:
                 return
         if message.chat.id not in newPage:
