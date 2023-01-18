@@ -313,6 +313,11 @@ def createQuote(message):
             else:
                 quotesbot.send_message(message.chat.id, "Sorry, there seems to be an error, try again with the command /new")
 
+#stops the creation of a new page
+@quotesbot.message_handler(commands=["cancel"])
+def cancelNewPage(message):
+    del newPage[message.chat.id]
+
 #if the function checkToken returns True asks for the notion Database ID
 @quotesbot.message_handler(func=checkToken)
 def verifyToken(message):
