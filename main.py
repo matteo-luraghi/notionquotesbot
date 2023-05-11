@@ -32,8 +32,8 @@ def readDatabase(token, databaseId, quotes):
     for el in data["results"]:
         textObj = el["properties"]["Text"]["rich_text"]
         text = ''
-        for el in textObj:
-            text += el["text"]["content"]
+        for phrase in textObj:
+            text += phrase["text"]["content"]
         title = el["properties"]["Name"]["title"][0]["plain_text"]
         try:
             author = el["properties"]["Author"]["rollup"]["array"][0]["rich_text"][0]["text"]["content"]    
