@@ -30,7 +30,10 @@ def readDatabase(token, databaseId, quotes):
     res = requests.request("POST", readUrl, headers=headers)
     data = res.json()
     for el in data["results"]:
-        text = el["properties"]["Text"]["rich_text"][0]["text"]["content"]
+        textObj = el["properties"]["Text"]["rich_text"]
+        text = ''
+        for el in textObj:
+            text += el["text"]["content"]
         title = el["properties"]["Name"]["title"][0]["plain_text"]
         try:
             author = el["properties"]["Author"]["rollup"]["array"][0]["rich_text"][0]["text"]["content"]    
@@ -371,4 +374,4 @@ if __name__ == "__main__":
     schedule.every().day.at(TIME).do(automaticQuote)
     Thread(target=schedule_checker).start() 
     keep_alive()
-    quotesbot.polling()
+    quotesbot.polling()   
