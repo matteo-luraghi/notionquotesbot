@@ -121,6 +121,12 @@ def quote(message):
         if randomQuote != None:
             sendQuote(randomQuote, userKey)
 
+@bot.message_handler(commands=["help"])
+def help(message):
+    with open("commands.txt", "r") as f:
+        commands = f.read()
+    bot.send_message(str(message.chat.id), commands)
+
 @bot.message_handler(func=checkToken)
 def verifyToken(message):
     bot.send_message(str(message.chat.id), "Send the Notion database Id")

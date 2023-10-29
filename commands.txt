@@ -1,0 +1,3 @@
+start - initialize the bot
+quote - send a random quote from the database
+help - see all the commands
