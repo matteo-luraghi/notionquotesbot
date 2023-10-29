@@ -1,9 +1,8 @@
-import telebot, os, time, requests, json, random, schedule
+import telebot, time, requests, json, random, schedule
 from threading import Thread
-from keep_alive import keep_alive
-from replit import db
 
-API_KEY = os.environ['API_KEY']
+with open("users.json", "r") as f:
+    db = json.load(f)
 
 init = {}
 newPage = {}
@@ -12,7 +11,7 @@ newPage = {}
 TIME = "12:30"
 
 #bot initialization                    
-quotesbot = telebot.TeleBot(API_KEY)
+quotesbot = telebot.TeleBot("5582618835:AAEmHG-rXVo6d2W7-gy-RATNjy99-JvuFHo")
 
 #creates the headers to access the notion API
 def createHeaders(token):
@@ -69,6 +68,9 @@ def checkToken(message):
             if message.text.split('_')[0] == "secret":
                 db[str(message.chat.id)].append(message.text)
                 init[message.chat.id][0] = 1
+                print(db)
+                with open("users.json", "w") as f:
+                    json.dump(f, db)
                 return True
             quotesbot.send_message(message.chat.id, "Notion token not valid, try to send it again")
             return False
@@ -84,6 +86,8 @@ def checkDatabseId(message):
             if len(message.text) >= 25:
                 db[str(message.chat.id)].append(message.text)
                 init[message.chat.id][1] = 1
+                with open("users.json", "w") as f:
+                    json.dump(f, db)
                 return True
             quotesbot.send_message(message.chat.id, "Database ID not valid, try to send it again")
     return False
@@ -143,6 +147,8 @@ def start(message):
     quotesbot.send_message(message.chat.id, "Let's get you ready to start using the bot")
     if str(message.chat.id) not in db:
         db[str(message.chat.id)] = []
+        with open("users.json", "w") as f:
+            json.dump(f, db)
     if len(db[str(message.chat.id)])==0 or db[str(message.chat.id)][2] != "initialized":
         tokenOk = 0
         databaseIdOk = 0
@@ -347,6 +353,8 @@ def verifyDatabaseId(message):
     else:
         quotesbot.send_message(message.chat.id, "Setup completed!")
         db[str(message.chat.id)].append("initialized")
+        with open("users.json", "w") as f:
+            json.dump(f, db)
         del init[message.chat.id]
 
 #if the function checkTitle returns True asks the user to send the content for the new quote
@@ -373,5 +381,4 @@ if __name__ == "__main__":
     #schedules the daily quote
     schedule.every().day.at(TIME).do(automaticQuote)
     Thread(target=schedule_checker).start() 
-    keep_alive()
     quotesbot.polling()   
