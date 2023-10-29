@@ -14,7 +14,10 @@ def getUsers():
 
 TIME = "08:00"
 
-bot = telebot.TeleBot("5582618835:AAEmHG-rXVo6d2W7-gy-RATNjy99-JvuFHo")
+with open("utilities/token.txt", "r") as f:
+    API_KEY = f.read()
+
+bot = telebot.TeleBot(API_KEY)
 
 def createHeaders(token: str):
     return {
