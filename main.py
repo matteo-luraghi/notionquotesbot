@@ -1,5 +1,6 @@
-import telebot, time, requests, json, random, schedule
+import telebot, time, requests, json, random, schedule, os
 from threading import Thread
+from dotenv import load_dotenv
 
 class Quote:
     def __init__(self, text="", title="", author=""):
@@ -14,9 +15,11 @@ def getUsers():
 
 TIME = "08:00"
 
-with open("utilities/token.txt", "r") as f:
-    API_KEY = f.read()
+load_dotenv('.env')
 
+API_KEY = None
+while API_KEY == None:
+    API_KEY = os.getenv("API_KEY")
 bot = telebot.TeleBot(API_KEY)
 
 def createHeaders(token: str):
