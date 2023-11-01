@@ -164,4 +164,4 @@ def verifyDatabase(message : telebot.types.Message):
 if __name__ == "__main__":
     schedule.every().day.at(TIME).do(autoQuote)
     Thread(target=scheduleChecker).start()
-    bot.polling()
+    bot.infinity_polling()
