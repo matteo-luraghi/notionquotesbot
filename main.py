@@ -62,13 +62,15 @@ def scheduleChecker():
         schedule.run_pending()
         time.sleep(1)
 
-def getRandomQuote(user):
+def getRandomQuote(user : dict, userKey : str):
     quotes = readDatabase(user["token"], user["databaseId"])
-    if quotes != None and len(quotes) != 0:
-        randomQuote: Quote = quotes[random.randint(0, len(quotes)-1)]
-        return randomQuote
-    else:
-        return None
+    if quotes != None:
+        if len(quotes) != 0:
+            randomQuote: Quote = quotes[random.randint(0, len(quotes)-1)]
+            return randomQuote
+        else:
+            bot.send_message(userKey, "There are no quotes in your database!")
+    return None
 
 def sendQuote(quote: Quote, userKey: str):
     bot.send_message(userKey, quote.text)
@@ -78,7 +80,7 @@ def sendQuote(quote: Quote, userKey: str):
 def autoQuote():
     users = getUsers()
     for userKey in users:
-        randomQuote = getRandomQuote(users[userKey])
+        randomQuote = getRandomQuote(users[userKey], userKey)
         if randomQuote != None:
             sendQuote(randomQuote, userKey)
    
@@ -127,7 +129,7 @@ def quote(message : telebot.types.Message):
     users = getUsers()
     userKey = str(message.chat.id)
     if userKey in users.keys() and users[userKey]["init"] == True:
-        randomQuote = getRandomQuote(users[userKey])
+        randomQuote = getRandomQuote(users[userKey], userKey)
         if randomQuote != None:
             sendQuote(randomQuote, userKey)
 
