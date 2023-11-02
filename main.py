@@ -50,7 +50,7 @@ def readDatabase(token : str, databaseId : str):
         except:
             title = ''
         try:
-            author = el["properties"]["Author"]["rollup"]["array"][0]["rich_text"][0]["text"]["content"]
+            author = el["properties"]["AuthorB"]["rollup"]["array"][0]["rich_text"][0]["text"]["content"]
         except:
             try:
                 author = el["properties"]["Author"]["rich_text"][0]["text"]["content"]
