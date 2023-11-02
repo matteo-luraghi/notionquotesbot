@@ -8,7 +8,7 @@ class Quote:
         self.title = title
         self.author = author
 
-def getUsers():
+def getUsers() -> dict:
     with open("users.json", "r") as f:
         usersDb = json.load(f)
     return usersDb
@@ -22,14 +22,14 @@ while API_KEY == None:
     API_KEY = os.getenv("API_KEY")
 bot = telebot.TeleBot(API_KEY)
 
-def createHeaders(token: str):
+def createHeaders(token: str) -> dict:
     return {
         "Authorization": "Bearer " +  token,
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28"
     }
 
-def readDatabase(token : str, databaseId : str):
+def readDatabase(token : str, databaseId : str) -> list[Quote] | None:
     headers = createHeaders(token)
     readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
     res = requests.request("POST", readUrl, headers=headers)
@@ -65,7 +65,7 @@ def scheduleChecker():
         schedule.run_pending()
         time.sleep(1)
 
-def getRandomQuote(user : dict, userKey : str):
+def getRandomQuote(user : dict, userKey : str) -> Quote | None:
     quotes = readDatabase(user["token"], user["databaseId"])
     if quotes != None:
         if len(quotes) != 0:
@@ -87,7 +87,7 @@ def autoQuote():
         if randomQuote != None:
             sendQuote(randomQuote, userKey)
    
-def checkToken(message : telebot.types.Message):
+def checkToken(message : telebot.types.Message) -> bool:
     users = getUsers()
     userKey = str(message.chat.id)
     if userKey in users.keys() and users[userKey]["init"] == False and "token" not in users[userKey].keys():
@@ -102,7 +102,7 @@ def checkToken(message : telebot.types.Message):
         bot.send_message(userKey, "Use the command /start to initialize the bot")
     return False
 
-def checkDatabaseId(message : telebot.types.Message):
+def checkDatabaseId(message : telebot.types.Message) -> bool:
     users = getUsers()
     userKey = str(message.chat.id)
     if userKey in users.keys() and users[userKey]["init"] == False and "databaseId" not in users[userKey].keys():
