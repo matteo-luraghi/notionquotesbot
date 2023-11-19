@@ -15,7 +15,10 @@ def getUsers() -> dict:
 
 TIME = "08:00"
 
-load_dotenv('.env')
+try:
+    load_dotenv('.env')
+except:
+    print("Failed to load .env")
 
 API_KEY = None
 while API_KEY == None:

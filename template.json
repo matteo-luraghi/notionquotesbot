@@ -1,0 +1,25 @@
+{"parent": {"database_id": null},
+  "properties": {
+    "Author": {
+      "rich_text": [{
+        "text": {
+          "content": null
+        }
+      }]
+    },
+    "Name": {
+      "title": [{
+        "text": {
+          "content": null
+        }
+      }]
+    },
+    "Text": {
+      "rich_text": [{
+        "text": {
+          "content": null
+        }
+      }]
+    }
+  }
+}
