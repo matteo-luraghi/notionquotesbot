@@ -1,5 +1,4 @@
-utilities
 users.json
-.env
-test.py
 .handler-saves
+config.py
+__pycache__
