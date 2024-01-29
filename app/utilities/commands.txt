@@ -1,3 +1,5 @@
 start - initialize the bot
 quote - send a random quote from the database
+author {name} - sends all the quotes from the author
+authors - see all the authors and select which to receive quotes from
 help - see all the commands

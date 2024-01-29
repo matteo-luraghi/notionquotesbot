@@ -1,6 +1,7 @@
 import telebot
 from json import dump as jdump
 from os import getenv
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import utils
 
 API_KEY = getenv("API_KEY")
@@ -18,11 +19,16 @@ bot.load_next_step_handlers()
 #sends a quote to the user if the database is not empty
 def sendQuote(quote: utils.Quote | None, userKey: str):
     if quote != None:
-        bot.send_message(userKey, quote.text)
-        titleAuthor = f'"{quote.title}" - {quote.author}'
-        bot.send_message(userKey, titleAuthor)
-    else:
-        bot.send_message(userKey, "There are no quotes in your database!")
+        bot.send_message(userKey, str(quote))
+
+def sendQuoteAuthor(userKey: str, author: str):
+    author = author.lower()
+    users = utils.getUsers()
+    quotes = utils.readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
+    if quotes != None:
+        for quote in quotes:
+            if author in quote.author.lower().split(" ") or author == quote.author.lower():
+                sendQuote(quote, userKey)
 
 #checks if the token is valid and if so saves it temporarely
 def checkToken(message : telebot.types.Message):
@@ -96,8 +102,29 @@ def quote(message : telebot.types.Message):
     else:
         bot.send_message(userKey, "Use the /start command to setup the bot")
 
+@bot.message_handler(commands=["author"])
+def searchAuthor(message: telebot.types.Message):
+    author = str(message.text).split(" ")[1]
+    userKey = str(message.chat.id)
+    sendQuoteAuthor(userKey, author)
+    
+@bot.message_handler(commands=["authors"])
+def authorsList(message: telebot.types.Message):
+    userKey = str(message.chat.id)
+    authors = utils.getAuthors(userKey)
+    if authors != None:
+        markup = InlineKeyboardMarkup()
+        for author in authors:
+            markup.add(InlineKeyboardButton(author, callback_data=f"author_{author}"))
+        bot.send_message(message.chat.id, "Choose:", reply_markup=markup)
+
 @bot.message_handler(commands=["help"])
 def help(message : telebot.types.Message):
     with open("utilities/commands.txt", "r") as f:
         commands = f.read()
     bot.send_message(str(message.chat.id), commands)
+
+@bot.callback_query_handler(func=lambda callback: callback.data.startswith("author_"))
+def filterAuthor(callback):
+    author = callback.data.split("_")[1]
+    sendQuoteAuthor(str(callback.message.chat.id), author)

@@ -8,6 +8,9 @@ class Quote:
         self.title = title
         self.author = author
 
+    def __str__(self):
+        return f"{self.text}\n\n{self.title} - {self.author}"
+
 #returns all the users
 def getUsers() -> dict:
     with open("data/users.json", "r") as f:
@@ -58,3 +61,13 @@ def getRandomQuote(user : dict) -> Quote | None:
             randomQuote: Quote = quotes[randint(0, len(quotes)-1)]
             return randomQuote
     return None
+
+def getAuthors(userKey: str) -> list | None:
+    users = getUsers()
+    authors = []
+    if userKey in users.keys() and users[userKey]["init"] == True:
+        quotes = readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
+        if quotes != None:
+            authors = [quote.author for quote in quotes]
+    authors = list(set(authors))
+    return authors
