@@ -1,7 +1,7 @@
-import telebot
 from json import dump as jdump
 from os import getenv
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from telebot import TeleBot
 import utils
 
 API_KEY = getenv("API_KEY")
@@ -12,7 +12,7 @@ except:
     pass
 
 #initialization
-bot = telebot.TeleBot(API_KEY)
+bot = TeleBot(API_KEY)
 bot.enable_save_next_step_handlers(delay=1)
 bot.load_next_step_handlers()
 
@@ -37,7 +37,7 @@ def sendQuoteTitle(userKey: str, title: str):
                 sendQuote(quote, userKey)
 
 #checks if the token is valid and if so saves it temporarely
-def checkToken(message : telebot.types.Message):
+def checkToken(message : Message):
     users = utils.getUsers()
     userKey = str(message.chat.id)
     if userKey in users.keys() and users[userKey]["init"] == False:
@@ -58,7 +58,7 @@ def checkToken(message : telebot.types.Message):
 
 #checks if the database ID is valid and if, combined with the token
 #the bot manages to connect to notion, it saves the user
-def checkDatabaseId(message : telebot.types.Message):
+def checkDatabaseId(message : Message):
     users = utils.getUsers()
     userKey = str(message.chat.id)
     if userKey in users.keys() and users[userKey]["init"] == False and "databaseId" not in users[userKey].keys():
@@ -82,7 +82,7 @@ def checkDatabaseId(message : telebot.types.Message):
 
 #bot's commands
 @bot.message_handler(commands=["start"])
-def start(message : telebot.types.Message):
+def start(message : Message):
     users = utils.getUsers()
     userKey = str(message.chat.id)
     if userKey not in users.keys():
@@ -98,7 +98,7 @@ def start(message : telebot.types.Message):
         bot.send_message(userKey, "You are ready to use the bot!")
 
 @bot.message_handler(commands=["quote"])
-def quote(message : telebot.types.Message):
+def quote(message : Message):
     users = utils.getUsers()
     userKey = str(message.chat.id)
     if userKey in users.keys() and users[userKey]["init"] == True:
@@ -109,7 +109,7 @@ def quote(message : telebot.types.Message):
         bot.send_message(userKey, "Use the /start command to setup the bot")
 
 @bot.message_handler(commands=["author", "title"])
-def searchAuthor(message: telebot.types.Message):
+def searchAuthor(message: Message):
     command, search = str(message.text).split(" ", 1)
     userKey = str(message.chat.id)
     match command:
@@ -117,7 +117,7 @@ def searchAuthor(message: telebot.types.Message):
         case "/title": sendQuoteTitle(userKey, search)
     
 @bot.message_handler(commands=["authors"])
-def authorsList(message: telebot.types.Message):
+def authorsList(message: Message):
     userKey = str(message.chat.id)
     authors = utils.getAuthors(userKey)
     if authors != None:
@@ -127,7 +127,7 @@ def authorsList(message: telebot.types.Message):
         bot.send_message(message.chat.id, "Choose:", reply_markup=markup)
 
 @bot.message_handler(commands=["help"])
-def help(message : telebot.types.Message):
+def help(message : Message):
     with open("utilities/commands.txt", "r") as f:
         commands = f.read()
     bot.send_message(str(message.chat.id), commands)
