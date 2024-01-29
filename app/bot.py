@@ -16,7 +16,7 @@ bot = TeleBot(API_KEY)
 bot.enable_save_next_step_handlers(delay=1)
 bot.load_next_step_handlers()
 
-def sendQuote(quote: utils.Quote, userKey: str):
+def sendQuote(quote: utils.Quote | None, userKey: str):
     if quote != None:
         bot.send_message(userKey, str(quote))
 
