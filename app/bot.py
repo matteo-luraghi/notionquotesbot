@@ -16,18 +16,24 @@ bot = telebot.TeleBot(API_KEY)
 bot.enable_save_next_step_handlers(delay=1)
 bot.load_next_step_handlers()
 
-#sends a quote to the user if the database is not empty
-def sendQuote(quote: utils.Quote | None, userKey: str):
+def sendQuote(quote: utils.Quote, userKey: str):
     if quote != None:
         bot.send_message(userKey, str(quote))
 
 def sendQuoteAuthor(userKey: str, author: str):
     author = author.lower()
-    users = utils.getUsers()
-    quotes = utils.readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
+    quotes = utils.getQuotes(userKey)
     if quotes != None:
         for quote in quotes:
             if author in quote.author.lower().split(" ") or author == quote.author.lower():
+                sendQuote(quote, userKey)
+
+def sendQuoteTitle(userKey: str, title: str):
+    title = title.lower()
+    quotes = utils.getQuotes(userKey)
+    if quotes != None:
+        for quote in quotes:
+            if title in quote.title.lower() or title == quote.title.lower():
                 sendQuote(quote, userKey)
 
 #checks if the token is valid and if so saves it temporarely
@@ -102,11 +108,13 @@ def quote(message : telebot.types.Message):
     else:
         bot.send_message(userKey, "Use the /start command to setup the bot")
 
-@bot.message_handler(commands=["author"])
+@bot.message_handler(commands=["author", "title"])
 def searchAuthor(message: telebot.types.Message):
-    author = str(message.text).split(" ")[1]
+    command, search = str(message.text).split(" ", 1)
     userKey = str(message.chat.id)
-    sendQuoteAuthor(userKey, author)
+    match command:
+        case "/author": sendQuoteAuthor(userKey, search)
+        case "/title": sendQuoteTitle(userKey, search)
     
 @bot.message_handler(commands=["authors"])
 def authorsList(message: telebot.types.Message):
