@@ -76,3 +76,13 @@ def getAuthors(userKey: str) -> set | None:
         if quotes != None:
             authors = {quote.author for quote in quotes}
     return authors
+
+def getTitles(userKey: str) -> set | None:
+    users = getUsers()
+    titles = {""}
+    titles.remove("")
+    if userKey in users.keys() and users[userKey]["init"] == True:
+        quotes = readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
+        if quotes != None:
+            titles = {quote.title for quote in quotes}
+    return titles

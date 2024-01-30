@@ -126,6 +126,16 @@ def authorsList(message: Message):
             markup.add(InlineKeyboardButton(author, callback_data=f"author_{author}"))
         bot.send_message(message.chat.id, "Choose:", reply_markup=markup)
 
+@bot.message_handler(commands=["titles"])
+def titlesList(message: Message):
+    userKey = str(message.chat.id)
+    titles = utils.getTitles(userKey)
+    if titles != None:
+        markup = InlineKeyboardMarkup()
+        for title in titles:
+            markup.add(InlineKeyboardButton(title, callback_data=f"title_{title}"))
+        bot.send_message(message.chat.id, "Choose:", reply_markup=markup)
+
 @bot.message_handler(commands=["help"])
 def help(message : Message):
     with open("utilities/commands.txt", "r") as f:
@@ -136,3 +146,8 @@ def help(message : Message):
 def filterAuthor(callback):
     author = callback.data.split("_")[1]
     sendQuoteAuthor(str(callback.message.chat.id), author)
+
+@bot.callback_query_handler(func=lambda callback: callback.data.startswith("title_"))
+def filterTitle(callback):
+    title = callback.data.split("_")[1]
+    sendQuoteTitle(str(callback.message.chat.id), title)
