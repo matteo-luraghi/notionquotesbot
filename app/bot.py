@@ -110,7 +110,11 @@ def quote(message : Message):
 
 @bot.message_handler(commands=["author", "title"])
 def searchAuthor(message: Message):
-    command, search = str(message.text).split(" ", 1)
+    try:
+        command, search = str(message.text).split(" ", 1)
+    except:
+        bot.send_message(message.chat.id, f"Write the name after the command\nEx. {message.text} name")
+        return
     userKey = str(message.chat.id)
     match command:
         case "/author": sendQuoteAuthor(userKey, search)
@@ -139,7 +143,11 @@ def titlesList(message: Message):
 @bot.message_handler(commands=["titleauthor"])
 def titleAuthor(message: Message):
     userKey = str(message.chat.id)
-    author = str(message.text).split(" ", 1)[1]
+    try:
+        author = str(message.text).split(" ", 1)[1]
+    except:
+        bot.send_message(message.chat.id, "Write the name of the author after the command\nEx. /titleauthor pirandello")
+        return
     titlesAuthor = utils.getTitlesAuthor(userKey, author)
     if titlesAuthor != None:
         markup = InlineKeyboardMarkup()
