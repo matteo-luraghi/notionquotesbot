@@ -136,6 +136,17 @@ def titlesList(message: Message):
             markup.add(InlineKeyboardButton(title, callback_data=f"title_{title}"))
         bot.send_message(message.chat.id, "Choose:", reply_markup=markup)
 
+@bot.message_handler(commands=["titleauthor"])
+def titleAuthor(message: Message):
+    userKey = str(message.chat.id)
+    author = str(message.text).split(" ", 1)[1]
+    titlesAuthor = utils.getTitlesAuthor(userKey, author)
+    if titlesAuthor != None:
+        markup = InlineKeyboardMarkup()
+        for title in titlesAuthor:
+            markup.add(InlineKeyboardButton(title, callback_data=f"title_{title}"))
+        bot.send_message(message.chat.id, "Choose:", reply_markup=markup)
+
 @bot.message_handler(commands=["help"])
 def help(message : Message):
     with open("utilities/commands.txt", "r") as f:

@@ -5,4 +5,3 @@ A simple telegram bot that can connect to Notion to send daily quotes from a per
 ## Possible updates
 
 - /new to add from the bot a quote
-- /titleauthor {name} - all the titles from the selected author

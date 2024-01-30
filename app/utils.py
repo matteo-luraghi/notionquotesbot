@@ -86,3 +86,14 @@ def getTitles(userKey: str) -> set | None:
         if quotes != None:
             titles = {quote.title for quote in quotes}
     return titles
+
+def getTitlesAuthor(userKey: str, author: str) -> set | None:
+    author = author.lower()
+    users = getUsers()
+    titles = {""}
+    titles.remove("")
+    if userKey in users.keys() and users[userKey]["init"] == True:
+        quotes = readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
+        if quotes != None:
+            titles = {quote.title for quote in quotes if author in quote.author.lower() or author == quote.author.lower()}
+    return titles
