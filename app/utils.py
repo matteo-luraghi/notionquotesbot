@@ -67,12 +67,12 @@ def getRandomQuote(user : dict) -> Quote | None:
             return randomQuote
     return None
 
-def getAuthors(userKey: str) -> list | None:
+def getAuthors(userKey: str) -> set | None:
     users = getUsers()
-    authors = []
+    authors = {""}
+    authors.remove("")
     if userKey in users.keys() and users[userKey]["init"] == True:
         quotes = readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
         if quotes != None:
-            authors = [quote.author for quote in quotes]
-    authors = list(set(authors))
+            authors = {quote.author for quote in quotes}
     return authors
