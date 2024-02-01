@@ -109,7 +109,7 @@ def quote(message : Message):
         bot.send_message(userKey, "Use the /start command to setup the bot")
 
 @bot.message_handler(commands=["author", "title"])
-def searchAuthor(message: Message):
+def search(message: Message):
     try:
         command, search = str(message.text).split(" ", 1)
     except:
