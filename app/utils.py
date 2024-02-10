@@ -17,7 +17,7 @@ def getUsers() -> dict:
         usersDb = jload(f)
     return usersDb
 
-def getQuotes(userKey: str) -> list | None:
+def getQuotes(userKey: str) -> list[Quote] | None:
     users = getUsers()
     quotes = readDatabase(users[userKey]["token"], users[userKey]["databaseId"])
     return quotes
