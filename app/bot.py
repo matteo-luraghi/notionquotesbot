@@ -10,13 +10,21 @@ import utils
 from telebot import TeleBot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
+# if API_KEY is an env variable, for production
 API_KEY = getenv("API_KEY")
+
+# if TEST_API_KEY is saved in config.py, for testing
 try:
     import config
 
     API_KEY = config.TEST_API_KEY
-except:
+
+except ModuleNotFoundError:
     pass
+
+if API_KEY is None:
+    raise RuntimeError("API key not configured")
+
 
 # initialization
 bot = TeleBot(API_KEY)
@@ -181,7 +189,7 @@ def search_command(message: Message):
 
     try:
         command, search = str(message.text).split(" ", 1)
-    except:
+    except (ValueError, IndexError):
         bot.send_message(
             message.chat.id,
             f"Write the name after the command\nEx. {message.text} name",
@@ -238,7 +246,7 @@ def title_author_command(message: Message):
     user_key = str(message.chat.id)
     try:
         author = str(message.text).split(" ", 1)[1]
-    except:
+    except (ValueError, IndexError):
         bot.send_message(
             message.chat.id,
             "Write the name of the author after the command\nEx. /titleauthor pirandello",

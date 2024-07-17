@@ -1,8 +1,8 @@
-start - initialize the bot
-quote - send a random quote from the database
-author {name} - sends all the quotes from the author
-authors - lets you see all the authors and send all the quotes from them
-title {book} - sends all the quotes from the chosen book
-titles - lets you see all the books and send all the quotes in the chosen one
-titleauthor {name} - lets you see all the books from the author and send all the quotes from them
-help - see all the commands
+/start - initialize the bot
+/quote - send a random quote from the database
+/author {name} - sends all the quotes from the author
+/authors - lets you see all the authors and send all the quotes from them
+/title {book} - sends all the quotes from the chosen book
+/titles - lets you see all the books and send all the quotes in the chosen one
+/titleauthor {name} - lets you see all the books from the author and send all the quotes from them
+/help - see all the commands

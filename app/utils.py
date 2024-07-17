@@ -82,20 +82,20 @@ def read_database(token: str, database_id: str) -> list[Quote] | None:
             text = ""
             for phrase in text_obj:
                 text += phrase["text"]["content"]
-        except:
+        except (KeyError, IndexError, TypeError):
             text = ""
         try:
             title = el["properties"]["Name"]["title"][0]["plain_text"]
-        except:
+        except (KeyError, IndexError, TypeError):
             title = ""
         try:
             author = el["properties"]["AuthorB"]["rollup"]["array"][0]["rich_text"][0][
                 "text"
             ]["content"]
-        except:
+        except (KeyError, IndexError, TypeError):
             try:
                 author = el["properties"]["Author"]["rich_text"][0]["text"]["content"]
-            except:
+            except (KeyError, IndexError, TypeError):
                 author = ""
         if text != "" and title != "" and author != "":
             quotes.append(Quote(text, title, author))
