@@ -25,17 +25,17 @@ class Quote:
 
     @property
     def text(self):
-        """ text getter"""
+        """text getter"""
         return self._text
 
     @property
     def title(self):
-        """ title getter """
+        """title getter"""
         return self._title
 
     @property
     def author(self):
-        """ author getter """
+        """author getter"""
         return self._author
 
 
@@ -71,42 +71,64 @@ def read_database(token: str, database_id: str) -> list[Quote] | None:
         "Notion-Version": "2022-06-28",
     }
     read_url = f"https://api.notion.com/v1/databases/{database_id}/query"
-    res = reqpost(read_url, headers=headers, timeout=10)
-    if res.status_code != 200:
-        return None
-    data = res.json()
-    quotes = []
-    for el in data["results"]:
-        try:
-            text_obj = el["properties"]["Text"]["rich_text"]
-            text = ""
-            for phrase in text_obj:
-                text += phrase["text"]["content"]
-        except (KeyError, IndexError, TypeError):
-            text = ""
 
-        # general case
-        try:
-            title = el["properties"]["Book"]["rich_text"][0]["text"]["content"]
-        except (KeyError, IndexError, TypeError):
-            # personal case
+    quotes = []
+
+    # true until all the quotes are available
+    has_more = True
+    next_cursor = None
+
+    while has_more:
+
+        payload = {"page_size": 100}
+        if next_cursor:
+            payload["start_cursor"] = next_cursor
+
+        res = reqpost(read_url, headers=headers, json=payload, timeout=10)
+
+        if res.status_code != 200:
+            break
+
+        data = res.json()
+
+        # check if there are more results to fetch
+        has_more = data.get("has_more", False)
+        next_cursor = data.get("next_cursor", None)
+
+        for el in data["results"]:
+
             try:
-                title = el["properties"]["Name"]["title"][0]["plain_text"]
+                text_obj = el["properties"]["Text"]["rich_text"]
+                text = "".join(phrase["text"]["content"] for phrase in text_obj)
             except (KeyError, IndexError, TypeError):
-                title = ""
-        # personal case
-        try:
-            author = el["properties"]["AuthorB"]["rollup"]["array"][0]["rich_text"][0][
-                "text"
-            ]["content"]
-        except (KeyError, IndexError, TypeError):
+                text = ""
+
             # general case
             try:
-                author = el["properties"]["Author"]["rich_text"][0]["text"]["content"]
+                title = el["properties"]["Book"]["rich_text"][0]["text"]["content"]
             except (KeyError, IndexError, TypeError):
-                author = ""
-        if text != "" and title != "" and author != "":
-            quotes.append(Quote(text, title, author))
+                # personal case
+                try:
+                    title = el["properties"]["Name"]["title"][0]["plain_text"]
+                except (KeyError, IndexError, TypeError):
+                    title = ""
+            # personal case
+            try:
+                author = el["properties"]["AuthorB"]["rollup"]["array"][0]["rich_text"][
+                    0
+                ]["text"]["content"]
+            except (KeyError, IndexError, TypeError):
+                # general case
+                try:
+                    author = el["properties"]["Author"]["rich_text"][0]["text"][
+                        "content"
+                    ]
+                except (KeyError, IndexError, TypeError):
+                    author = ""
+
+            if text != "" and title != "" and author != "":
+                quotes.append(Quote(text, title, author))
+
     return quotes
 
 
@@ -134,7 +156,7 @@ def get_authors(user_key: str) -> set | None:
     if user_key in users.keys() and users[user_key]["init"] is True:
         quotes = read_database(users[user_key]["token"], users[user_key]["databaseId"])
         if quotes is not None:
-            authors = {quote.author for quote in quotes}
+            authors = {quote.author.strip() for quote in quotes}
     return authors
 
 
@@ -149,7 +171,9 @@ def get_titles(user_key: str) -> set | None:
     if user_key in users.keys() and users[user_key]["init"] is True:
         quotes = read_database(users[user_key]["token"], users[user_key]["databaseId"])
         if quotes is not None:
-            titles = {quote.title for quote in quotes}
+            titles = {quote.title.strip() for quote in quotes}
+    for title in titles:
+        print(title)
     return titles
 
 
@@ -167,8 +191,8 @@ def get_titles_author(user_key: str, author: str) -> set | None:
         quotes = read_database(users[user_key]["token"], users[user_key]["databaseId"])
         if quotes is not None:
             titles = {
-                quote.title
+                quote.title.strip()
                 for quote in quotes
-                if author in quote.author.lower() or author == quote.author.lower()
+                if author in quote.author.lower().strip() or author == quote.author.lower().strip()
             }
     return titles
