@@ -4,17 +4,17 @@ Welcome to **Quotes Bot**! This Telegram bot connects to your Notion database fi
 
 ## 🚀 Features
 
-- **/quote** - Sends a random quote from the database.
-- **/author {name}** - Sends all quotes from the specified author.
-- **/authors** - Lists all authors and sends all quotes from them.
-- **/title {book}** - Sends all quotes from the specified book.
-- **/titles** - Lists all books and sends all quotes from the selected one.
-- **/titleauthor {name}** - Lists all books by the specified author and sends all quotes from them.
-- **Daily Quote** - Automatically sends a random quote from a random book every morning. 🌅
+- 🎲 **/quote** - Sends a random quote from the database.
+- 🖋️ **/author {name}** - Sends all quotes from the specified author.
+- 📝 **/authors** - Lists all authors and sends all quotes from them.
+- 📖 **/title {book}** - Sends all quotes from the specified book.
+- 📚 **/titles** - Lists all books and sends all quotes from the selected one.
+- ✍️  **/titleauthor {name}** - Lists all books by the specified author and sends all quotes from them.
+- 📅 **Daily Quote** - Automatically sends a random quote from a random book every morning.
 
 ## 🛠️ Setup Instructions
 
-1. **Clone the repository**  
+1. **Clone the repository**
    ```bash
    git clone https://github.com/matteo-luraghi/notionquotesbot.git
    cd quotebot
@@ -38,10 +38,7 @@ Welcome to **Quotes Bot**! This Telegram bot connects to your Notion database fi
 ## 🌟 Usage
 
 Once the bot is running, invite it to your Telegram group or chat with it directly. Use the commands listed above to interact with your quote database.
-## 📅 Daily Quotes
 
-Quotes Bot will automatically send a random quote from a random book every morning to keep your day inspired! Make sure your bot is always running to receive this daily dose of wisdom.
 ## 📝 License
 
-This project is licensed under the MIT License.
-
+This project is licensed under the [MIT LICENSE](https://github.com/matteo-luraghi/notionquotesbot/blob/master/LICENSE).
