@@ -84,15 +84,23 @@ def read_database(token: str, database_id: str) -> list[Quote] | None:
                 text += phrase["text"]["content"]
         except (KeyError, IndexError, TypeError):
             text = ""
+
+        # general case
         try:
-            title = el["properties"]["Name"]["title"][0]["plain_text"]
+            title = el["properties"]["Book"]["rich_text"][0]["text"]["content"]
         except (KeyError, IndexError, TypeError):
-            title = ""
+            # personal case
+            try:
+                title = el["properties"]["Name"]["title"][0]["plain_text"]
+            except (KeyError, IndexError, TypeError):
+                title = ""
+        # personal case
         try:
             author = el["properties"]["AuthorB"]["rollup"]["array"][0]["rich_text"][0][
                 "text"
             ]["content"]
         except (KeyError, IndexError, TypeError):
+            # general case
             try:
                 author = el["properties"]["Author"]["rich_text"][0]["text"]["content"]
             except (KeyError, IndexError, TypeError):
