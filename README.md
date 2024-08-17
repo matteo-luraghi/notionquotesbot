@@ -41,4 +41,4 @@ Once the bot is running, invite it to your Telegram group or chat with it direct
 
 ## 📝 License
 
-This project is licensed under the [MIT LICENSE](https://github.com/matteo-luraghi/notionquotesbot/blob/master/LICENSE).
+This project is licensed under the [MIT LICENSE](LICENSE).
