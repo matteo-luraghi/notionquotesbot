@@ -27,7 +27,7 @@ Welcome to **Quotes Bot**! This Telegram bot connects to your Notion database fi
    - Duplicate the [template](https://cold-market-982.notion.site/795b385cfa41464fac7c1106d436b1a7?v=818bdc289cda47458f4e0fd676738134&pvs=4) to create your own database
    - Share your Notion database with the integration by going to your database, clicking "Share," and adding your integration.
 4. **Configure Environment Variables**
-   - Create a `config.py` file in the project `/app` directory with the following content: `API_KEY="your-telegram-api-key"`
+   - Create a `.env` file in the root directory with the following content: `API_KEY=your-telegram-api-key`
 5. **Run the bot**
    - Run the bot using docker:
      ```bash
