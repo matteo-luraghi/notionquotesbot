@@ -3,6 +3,8 @@ Utils module
 useful functions to manage the connection with the db
 """
 
+import os
+from json import dump as jdump
 from json import load as jload
 from random import randint
 
@@ -44,6 +46,11 @@ def get_users() -> dict:
     get all the users
     """
 
+    # initialize empty json file
+    if not os.path.exists("data/users.json"):
+        with open("data/users.json", mode="w", encoding="UTF-8") as f:
+            jdump({}, f)
+
     with open("data/users.json", mode="r", encoding="UTF-8") as f:
         users_db = jload(f)
     return users_db
@@ -79,7 +86,6 @@ def read_database(token: str, database_id: str) -> list[Quote] | None:
     next_cursor = None
 
     while has_more:
-
         payload = {"page_size": 100}
         if next_cursor:
             payload["start_cursor"] = next_cursor
@@ -96,7 +102,6 @@ def read_database(token: str, database_id: str) -> list[Quote] | None:
         next_cursor = data.get("next_cursor", None)
 
         for el in data["results"]:
-
             try:
                 text_obj = el["properties"]["Text"]["rich_text"]
                 text = "".join(phrase["text"]["content"] for phrase in text_obj)
@@ -193,6 +198,7 @@ def get_titles_author(user_key: str, author: str) -> set | None:
             titles = {
                 quote.title.strip()
                 for quote in quotes
-                if author in quote.author.lower().strip() or author == quote.author.lower().strip()
+                if author in quote.author.lower().strip()
+                or author == quote.author.lower().strip()
             }
     return titles

@@ -1,9 +1,10 @@
-version: "2.0"
 services:
   quotesbot:
     build: .
     container_name: quotesbot
     network_mode: host
+    env_file: .env
     environment:
+      - API_KEY = ${API_KEY}
       - TZ=Europe/Rome
     restart: unless-stopped
