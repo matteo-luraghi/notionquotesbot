@@ -7,4 +7,6 @@ services:
     environment:
       - API_KEY=${API_KEY}
       - TZ=Europe/Rome
+    volumes:
+      - ./app/data:/app/data
     restart: unless-stopped
